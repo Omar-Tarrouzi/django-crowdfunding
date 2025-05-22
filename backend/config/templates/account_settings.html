@@ -1,0 +1,64 @@
+<!-- templates/account_settings.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1>Account Settings</h1>
+
+<!-- Common Section: Password Change -->
+<h2>Change Password</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ pw_form.as_p }}
+    <button type="submit">Change Password</button>
+</form>
+
+<hr>
+
+{% if user.userprofile.role == 'donneur' %}
+    <h2>Your Liked Projects</h2>
+    {% for project in user.favorite_set.all %}
+        <div>
+            <h3>{{ project.project.titre }}</h3>
+            <p>{{ project.project.description }}</p>
+        </div>
+    {% empty %}
+        <p>You have no liked projects.</p>
+    {% endfor %}
+
+{% elif user.userprofile.role == 'createur' %}
+    <h2>Your Created Projects</h2>
+    {% for project in user.createur.projet_set.all %}
+        <div>
+            <h3>{{ project.titre }}</h3>
+            <p>{{ project.description }}</p>
+            <a href="{% url 'project_update' project.id %}">Edit</a>
+            <a href="{% url 'project_delete' project.id %}">Delete</a>
+        </div>
+    {% empty %}
+        <p>You have not created any projects.</p>
+    {% endfor %}
+
+{% elif user.userprofile.role == 'admin' %}
+    <h2>Admin Dashboard</h2>
+    <a href="{% url 'admin_dashboard' %}">Go to Admin Dashboard</a>
+{% endif %}
+
+{% if role == 'donor' %}
+  <h2>Mes projets favoris</h2>
+  {% for project in favorite_projects %}
+    <p>{{ project.titre }}</p>
+  {% endfor %}
+{% elif role == 'creator' %}
+  <h2>Mes projets créés</h2>
+  {% for project in creator_projects %}
+    <p>{{ project.titre }}</p>
+  {% endfor %}
+{% elif role == 'admin' %}
+  <h2>Dashboard Admin</h2>
+  {% for project in all_projects %}
+    <p>{{ project.titre }} - <a href="{% url 'project_update' project.id %}">Modifier</a></p>
+  {% endfor %}
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Mes projets favoris</h2>
+    
+    {% if favorite_projects %}
+        <div class="project-list">
+            {% for project in favorite_projects %}
+                <div class="project-card">
+                    <h3><a href="{% url 'project_detail' project.id %}">{{ project.nom }}</a></h3>
+                    <img src="{{ project.image.url }}" alt="{{ project.nom }}" style="width: 200px; height: auto;">
+                    <p>{{ project.description|truncatewords:20 }}</p>
+                    <p><strong>Montant récolté:</strong> {{ project.montant_recolte }} / {{ project.montant_objectif }}</p>
+                    <a href="{% url 'donate' project.id %}" class="btn btn-primary">Faire un don</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Vous n'avez ajouté aucun projet aux favoris.</p>
+    {% endif %}
+</div>
+{% endblock %}

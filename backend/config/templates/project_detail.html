@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>{{ project.titre }}</h1>
+  <img src="{{ project.image.url }}" alt="{{ project.titre }}" style="max-width: 300px;">
+  <p>{{ project.description }}</p>
+  <p><strong>Montant récolté:</strong> {{ project.montant_recolte }} / {{ project.montant_objectif }}</p>
+  <p><strong>Créateur:</strong> {{ project.createur.nom }}</p>
+
+  <div style="margin-top: 20px;">
+    <!-- Bouton DONATE toujours visible -->
+    <a href="{% url 'donate' project.id %}" class="btn btn-success">Faire un don</a>
+
+    <!-- Bouton FAVORIS (like/unlike) -->
+    <form method="post" action="{% url 'like_project' project.id %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-info">Ajouter aux favoris</button>
+    </form>
+
+    <!-- Boutons EDIT et DELETE visibles uniquement pour le créateur ou un admin -->
+    {% if request.user.is_authenticated %}
+      {% if request.user.is_superuser or request.user.email == project.createur.email %}
+      <a href="{% url 'project_update' project.id %}" class="btn btn-warning">Modifier</a>
+
+        <form method="post" action="{% url 'project_delete' project.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Supprimer</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

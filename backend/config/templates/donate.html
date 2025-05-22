@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Donate to {{ project.titre }}</h2>
+
+    <div class="d-flex justify-content-center">
+        <form method="post" action="{% url 'donate' project.id %}" class="card p-4 shadow-sm" style="max-width: 400px; width: 100%;">
+            {% csrf_token %}
+            <h4 class="mb-4 text-center">Paiement par carte bancaire</h4>
+            
+            <div class="mb-3">
+              {{ form.amount.label_tag }}
+              {{ form.amount }}
+            </div>
+            <div class="mb-3">
+              {{ form.card_number.label_tag }}
+              {{ form.card_number }}
+            </div>
+            <div class="mb-3">
+             
+
+          {{ form.expiration.label_tag }}
+          {{ form.expiration }}
+        </div>
+        <div class="mb-3">
+          {{ form.cvv.label_tag }}
+          {{ form.cvv }}
+        </div>
+      
+        <button type="submit" class="btn btn-success w-100">
+          Payer
+        </button>
+      </form>
+      
+</div>
+{% endblock %}

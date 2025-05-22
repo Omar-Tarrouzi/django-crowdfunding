@@ -1,0 +1,31 @@
+<h1>Admin Dashboard</h1>
+
+<h2>Projets</h2>
+<ul>
+  {% for project in projects %}
+    <li>{{ project.titre }} - {{ project.montant_recolte }}/{{ project.objectif }}</li>
+  {% endfor %}
+</ul>
+
+<h2>Créateurs</h2>
+<ul>
+  {% for creator in creators %}
+    <li>{{ creator.nom }}</li>
+  {% empty %}
+    <li>Aucun créateur trouvé.</li>
+  {% endfor %}
+</ul>
+
+<h2>Donneurs</h2>
+<ul>
+  {% for donor in donors %}
+    <li>{{ donor.nom }} - {{ donor.montant_donne }}€</li>
+  {% endfor %}
+</ul>
+
+<h2>Donations</h2>
+<ul>
+  {% for donation in donations %}
+    <li>{{ donation.donneur.nom }} → {{ donation.projet.titre }} : {{ donation.montant }}€</li>
+  {% endfor %}
+</ul>

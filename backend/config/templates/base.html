@@ -1,0 +1,242 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Crowdfunding</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=Pacifico&family=Lobster&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Background gradient for the body */
+        body {
+            background: linear-gradient(to right, #1e90ff, #47ffb5);
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Sticky Navbar */
+        .navbar {
+            background: linear-gradient(to right, #1e90ff, #47ffb5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Custom Hero Section Style */
+        .hero-section {
+            background: linear-gradient(to right, #1e90ff, #47ffb5);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        /* Sticky Overview Box */
+        .overview-box {
+            background: rgba(0, 0, 0, 0.7); /* Dark background with transparency */
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px); /* Optional: adds a slight blur effect */
+        }
+
+        /* Card Styles for Projects */
+        .project-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .project-card:hover {
+            transform: scale(1.05);
+        }
+
+        .project-card img {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .footer {
+            background: linear-gradient(to right, #1e90ff, #47ffb5);
+            padding: 30px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .footer a {
+            color: white;
+            margin: 0 15px;
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1.75rem;
+    }
+
+    .hero-section h1 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: 3rem;
+    }
+
+    .gradient-text {
+    background: linear-gradient(45deg, #1e90ff, #47ffb5, #ffa500, #ff0066);
+    background-size: 400% 400%;  /* Extend the gradient */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradientShift 5s ease infinite;
+}
+
+/* Animate the gradient "movement" */
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+    </style>
+</head>
+
+<!-- Login Prompt Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Authentication Required</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Vous devez être connecté pour effectuer cette action.
+        </div>
+        <div class="modal-footer">
+          <a  class="btn btn-primary">Se connecter</a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<body>
+    <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="{% static 'img/Logoalt.gif' %}" alt="Logo" height="70">
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav me-auto">
+              <li class="nav-item">
+                <a class="nav-link active" href="{% url 'home' %}">Accueil</a>
+              </li>
+            </ul>
+      
+            {% if user.is_authenticated %}
+              <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle" 
+                        type="button" 
+                        id="accountMenu" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false">
+                        <img src="{% static 'img/user_icon.gif' %}" alt="Logo" height="30"> {{ user.username }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountMenu">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'account_settings' %}">
+                      <i class="fas fa-cog"></i> Mon compte
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'favorite_projects' %}">
+                      <i class="fas fa-heart"></i> Mes favoris
+                    </a>
+                  </li>
+                  {% if request.user.userprofile.role == 'creator' %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                      <a class="dropdown-item" href="{% url 'projets:project_create' %}">
+                        <i class="fas fa-plus-circle"></i> Créer un projet
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="{% url 'projets:projects' %}">
+                        <i class="fas fa-edit"></i> Mes projets
+                      </a>
+                    </li>
+                  {% endif %}
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'logout' %}">
+                      <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            {% else %}
+              <a class="btn btn-light" href="{% url 'login' %}">
+                <i class="fas fa-sign-in-alt"></i> Login
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </nav>
+      
+
+    <main class="container mt-5">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="mb-2">&copy; 2025 Crowdfunding. All rights reserved.</p>
+            <div>
+                <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // the list of font-families to cycle
+        const fonts = ['Poppins','Pacifico','Lobster','Montserrat'];
+        let idx = 0;
+        // every 4 seconds, switch the font on all elements with .gradient-text
+        setInterval(() => {
+          document.querySelectorAll('.gradient-text').forEach(el => {
+            el.style.fontFamily = `'${fonts[idx]}'`;
+          });
+          idx = (idx + 1) % fonts.length;
+        }, 4000);
+    </script>
+  
+</body>
+
+</html>
