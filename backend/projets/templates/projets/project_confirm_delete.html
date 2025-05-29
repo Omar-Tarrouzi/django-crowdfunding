@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0">Supprimer le projet</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h4 class="alert-heading">Attention !</h4>
+                        <p>Vous êtes sur le point de supprimer le projet "{{ object.titre }}". Cette action est irréversible et supprimera également :</p>
+                        <ul>
+                            <li>Toutes les donations associées</li>
+                            <li>Tous les paliers de financement</li>
+                            <li>L'image du projet</li>
+                        </ul>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Détails du projet</h5>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Titre</dt>
+                                <dd class="col-sm-8">{{ object.titre }}</dd>
+
+                                <dt class="col-sm-4">Montant récolté</dt>
+                                <dd class="col-sm-8">{{ object.montant_recolte }} DH</dd>
+
+                                <dt class="col-sm-4">Nombre de dons</dt>
+                                <dd class="col-sm-8">{{ object.dons.count }}</dd>
+
+                                <dt class="col-sm-4">Date de création</dt>
+                                <dd class="col-sm-8">{{ object.date_creation|date:"d/m/Y" }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Confirmer la suppression
+                            </button>
+                            <a href="{% url 'projets:project_detail' object.pk %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -27,13 +27,46 @@ api.interceptors.request.use(
     }
 );
 
-// Add a response interceptor to handle errors
+// Add a response interceptor to handle errors and token refresh
 api.interceptors.response.use(
     (response) => {
         console.log('Response received:', response.status);
         return response;
     },
-    (error) => {
+    async (error) => {
+        const originalRequest = error.config;
+        
+        // If the error is 401 and we haven't tried to refresh the token yet
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            
+            try {
+                const refreshToken = localStorage.getItem('refreshToken');
+                if (!refreshToken) {
+                    throw new Error('No refresh token available');
+                }
+                
+                // Try to refresh the token
+                const response = await axios.post(`${API_BASE_URL}/token/refresh/`, {
+                    refresh: refreshToken
+                });
+                
+                const { access } = response.data;
+                localStorage.setItem('token', access);
+                
+                // Retry the original request with the new token
+                originalRequest.headers.Authorization = `Bearer ${access}`;
+                return api(originalRequest);
+            } catch (refreshError) {
+                console.error('Token refresh failed:', refreshError);
+                localStorage.removeItem('token');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+                return Promise.reject(refreshError);
+            }
+        }
+        
         console.error('Response error:', {
             status: error.response?.status,
             data: error.response?.data,
@@ -42,6 +75,8 @@ api.interceptors.response.use(
 
         if (error.response?.status === 401) {
             localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
             window.location.href = '/login';
         } else if (error.response?.status === 500) {
             console.error('Server error:', error.response.data);

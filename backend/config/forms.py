@@ -1,7 +1,8 @@
 from django import forms
-from config.models import Projet
+from config.models import Projet, UserProfile
 from django.contrib.auth.models import User
-from config.models import UserProfile,Createur
+from config.models import UserProfile, Createur
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 class ProjetForm(forms.ModelForm):
     class Meta:
@@ -20,35 +21,71 @@ class ProjetForm(forms.ModelForm):
             # For admin, show all creators
             self.fields['createur'].queryset = Createur.objects.all()
 
-
-class DonationForm(forms.Form):
-    amount = forms.DecimalField(
-        label="Montant (€)",
-        min_value=0.5,
-        decimal_places=2,
-        max_digits=10,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant'})
-    )
-    card_number = forms.CharField(
-        label="Numéro de carte",
-        min_length=13,
-        max_length=19,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234 5678 9012 3456'})
-    )
-    expiration = forms.CharField(
-        label="Expiration (MM/AA)",
-        max_length=5,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'MM/AA'})
-    )
-    cvv = forms.CharField(
-        label="CVV",
-        max_length=4,
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '123'})
-    )
-
 class SignUpForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
-    role     = forms.ChoiceField(choices=UserProfile.ROLE_CHOICES)
+    role = forms.ChoiceField(choices=[
+        ('donor', 'Donor'),
+        ('creator', 'Creator'),
+        ('admin', 'Admin')
+    ])
+    
     class Meta:
-        model  = User
-        fields = ['username','email','password']
+        model = User
+        fields = ['username', 'email', 'password', 'first_name', 'last_name']
+
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nom d\'utilisateur'
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Mot de passe'
+        })
+    )
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Email'
+        })
+    )
+    first_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Prénom'
+        })
+    )
+    last_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nom'
+        })
+    )
+    role = forms.ChoiceField(
+        choices=[
+            ('donor', 'Donor'),
+            ('creator', 'Creator'),
+            ('admin', 'Admin')
+        ],
+        widget=forms.Select(attrs={
+            'class': 'form-control'
+        })
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'role', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Nom d\'utilisateur'})
+        self.fields['password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Mot de passe'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirmer le mot de passe'})

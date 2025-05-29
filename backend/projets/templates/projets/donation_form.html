@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Faire un don - {{ project.titre }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Faire un don</h2>
+                    
+                    <!-- Project Info -->
+                    <div class="project-info mb-4">
+                        <h3>{{ project.titre }}</h3>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {{ project.avancement }}%;" 
+                                 aria-valuenow="{{ project.avancement }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ project.avancement }}%
+                            </div>
+                        </div>
+                        <p class="mb-1">Objectif: {{ project.montant_objectif }} DH</p>
+                        <p class="mb-1">Récolté: {{ project.montant_recolte }} DH</p>
+                        <p class="mb-3">Reste à collecter: {{ project.montant_restant }} DH</p>
+                    </div>
+
+                    <!-- Donation Form -->
+                    <form method="post" class="donation-form">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Credit Card Information -->
+                        <div class="card-details mb-4">
+                            <h4 class="mb-3">Informations de carte bancaire</h4>
+                            
+                            <div class="form-group mb-3">
+                                <label for="{{ form.card_number.id_for_label }}">Numéro de carte</label>
+                                {{ form.card_number }}
+                                {% if form.card_number.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.card_number.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ form.expiry_date.id_for_label }}">Date d'expiration</label>
+                                        {{ form.expiry_date }}
+                                        {% if form.expiry_date.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.expiry_date.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ form.cvv.id_for_label }}">CVV</label>
+                                        {{ form.cvv }}
+                                        {% if form.cvv.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.cvv.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Donation Amount -->
+                        <div class="form-group mb-4">
+                            <label for="{{ form.montant.id_for_label }}">Montant du don</label>
+                            {{ form.montant }}
+                            {% if form.montant.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.montant.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Support Message -->
+                        <div class="form-group mb-4">
+                            <label for="{{ form.message.id_for_label }}">Message de soutien</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.message.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <small class="form-text text-muted">Votre message sera visible sur la page du projet.</small>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Faire un don
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Format card number with spaces
+    document.getElementById('{{ form.card_number.id_for_label }}').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\s+/g, '');
+        let formattedValue = '';
+        for(let i = 0; i < value.length; i++) {
+            if(i > 0 && i % 4 === 0) {
+                formattedValue += ' ';
+            }
+            formattedValue += value[i];
+        }
+        e.target.value = formattedValue;
+    });
+
+    // Format expiry date
+    document.getElementById('{{ form.expiry_date.id_for_label }}').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if(value.length >= 2) {
+            value = value.substring(0,2) + '/' + value.substring(2);
+        }
+        e.target.value = value;
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Modifier le projet</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.titre.id_for_label }}" class="form-label">Titre du projet</label>
+                            {{ form.titre }}
+                            {% if form.titre.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.titre.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.description.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.montant_objectif.id_for_label }}" class="form-label">Montant objectif (DH)</label>
+                                {{ form.montant_objectif }}
+                                {% if form.montant_objectif.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.montant_objectif.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.date_fin.id_for_label }}" class="form-label">Date de fin</label>
+                                {{ form.date_fin }}
+                                {% if form.date_fin.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.date_fin.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">Image du projet</label>
+                            {% if project.image %}
+                            <div class="mb-2">
+                                <img src="{{ project.image.url }}" alt="Image actuelle" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
+                            {% endif %}
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.image.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.categorie.id_for_label }}" class="form-label">Catégorie</label>
+                            {{ form.categorie }}
+                            {% if form.categorie.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.categorie.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer les modifications
+                            </button>
+                            <a href="{% url 'projets:project_detail' project.pk %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add Bootstrap classes to form fields
+    const formFields = document.querySelectorAll('input, select, textarea');
+    formFields.forEach(field => {
+        if (!field.classList.contains('btn')) {
+            field.classList.add('form-control');
+        }
+    });
+
+    // Initialize date picker if needed
+    const dateInput = document.querySelector('#{{ form.date_fin.id_for_label }}');
+    if (dateInput) {
+        dateInput.type = 'date';
+    }
+});
+</script>
+{% endblock %}
+{% endblock %} 

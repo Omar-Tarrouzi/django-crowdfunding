@@ -1,0 +1,267 @@
+.project-detail {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.project-header h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin: 0;
+}
+
+.favorite-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.favorite-button.active {
+    color: #e74c3c;
+}
+
+.project-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.project-image {
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.project-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-image {
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 1.2rem;
+}
+
+.project-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.creator-info, .project-dates {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+}
+
+.project-progress {
+    margin: 1rem 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #2ecc71;
+    transition: width 0.3s ease;
+}
+
+.progress-stats {
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.project-description {
+    margin: 1rem 0;
+}
+
+.project-description h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.project-description p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.project-paliers {
+    margin: 2rem 0;
+}
+
+.project-paliers h3 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.paliers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.palier-card {
+    padding: 1rem;
+    border: 2px solid;
+    border-radius: 8px;
+    background-color: white;
+    transition: transform 0.3s ease;
+}
+
+.palier-card:hover {
+    transform: translateY(-5px);
+}
+
+.palier-card h4 {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.palier-montant {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2ecc71;
+    margin-bottom: 0.5rem;
+}
+
+.palier-description {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.donation-section {
+    margin-top: 2rem;
+}
+
+.donate-button {
+    width: 100%;
+    padding: 1rem;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.donate-button:hover {
+    background-color: #27ae60;
+}
+
+.donation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.donation-form input {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.donation-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.donation-buttons button {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.donation-buttons button[type="submit"] {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.donation-buttons button[type="submit"]:hover {
+    background-color: #27ae60;
+}
+
+.donation-buttons button[type="button"] {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.donation-buttons button[type="button"]:hover {
+    background-color: #c0392b;
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.error {
+    color: #e74c3c;
+}
+
+@media (max-width: 768px) {
+    .project-content {
+        grid-template-columns: 1fr;
+    }
+
+    .project-header h1 {
+        font-size: 2rem;
+    }
+
+    .project-image {
+        height: 300px;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+} 

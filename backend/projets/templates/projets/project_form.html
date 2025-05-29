@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{{ title }}</h3>
+                </div>
+                <div class="card-body">
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <p>{{ field.label }}: {{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.titre.id_for_label }}" class="form-label">Titre du projet</label>
+                            {{ form.titre }}
+                            {% if form.titre.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.titre.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.description.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.montant_objectif.id_for_label }}" class="form-label">Montant objectif (DH)</label>
+                            {{ form.montant_objectif }}
+                            {% if form.montant_objectif.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.montant_objectif.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.date_fin.id_for_label }}" class="form-label">Date de fin</label>
+                            {{ form.date_fin }}
+                            {% if form.date_fin.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.date_fin.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">Image du projet</label>
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.image.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Paliers de financement</label>
+                            <div id="paliers-container">
+                                <div class="palier-item mb-3 p-3 border rounded">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input type="text" name="palier_titre[]" class="form-control" placeholder="Titre du palier" required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" name="palier_montant[]" class="form-control" placeholder="Montant" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="text" name="palier_description[]" class="form-control" placeholder="Description" required>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-danger btn-sm remove-palier">×</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary mt-2" id="add-palier">Ajouter un palier</button>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Créer le projet</button>
+                            <a href="{% url 'projets:projects' %}" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paliersContainer = document.getElementById('paliers-container');
+    const addPalierBtn = document.getElementById('add-palier');
+
+    // Add new palier
+    addPalierBtn.addEventListener('click', function() {
+        const palierTemplate = `
+            <div class="palier-item mb-3 p-3 border rounded">
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" name="palier_titre[]" class="form-control" placeholder="Titre du palier" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" name="palier_montant[]" class="form-control" placeholder="Montant" required>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="palier_description[]" class="form-control" placeholder="Description" required>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-danger btn-sm remove-palier">×</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        paliersContainer.insertAdjacentHTML('beforeend', palierTemplate);
+    });
+
+    // Remove palier
+    paliersContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-palier')) {
+            e.target.closest('.palier-item').remove();
+        }
+    });
+
+    // Form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Collect paliers data
+        const paliers = [];
+        const palierItems = document.querySelectorAll('.palier-item');
+        
+        palierItems.forEach((item, index) => {
+            const titre = item.querySelector('input[name="palier_titre[]"]').value;
+            const montant = item.querySelector('input[name="palier_montant[]"]').value;
+            const description = item.querySelector('input[name="palier_description[]"]').value;
+            
+            paliers.push({
+                titre: titre,
+                montant: montant,
+                description: description,
+                ordre: index
+            });
+        });
+
+        // Add paliers data to form
+        const paliersInput = document.createElement('input');
+        paliersInput.type = 'hidden';
+        paliersInput.name = 'paliers[]';
+        paliersInput.value = JSON.stringify(paliers);
+        this.appendChild(paliersInput);
+
+        // Submit form
+        this.submit();
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

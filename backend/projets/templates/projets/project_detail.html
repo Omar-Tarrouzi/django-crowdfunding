@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Project Main Content -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                {% if project.image %}
+                <img src="{{ project.image.url }}" class="card-img-top" alt="{{ project.titre }}" style="height: 400px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                    <i class="fas fa-image fa-5x text-muted"></i>
+                </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h1 class="card-title mb-3">{{ project.titre }}</h1>
+                    
+                    <div class="progress mb-4" style="height: 25px;">
+                        <div class="progress-bar {% if project.avancement >= 100 %}bg-success{% endif %}" 
+                             role="progressbar" 
+                             style="width: {{ project.avancement }}%;" 
+                             aria-valuenow="{{ project.avancement }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ project.avancement|floatformat:1 }}%
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Objectif</h5>
+                                    <p class="card-text h4">{{ project.montant_objectif }} DH</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Récolté</h5>
+                                    <p class="card-text h4">{{ project.montant_recolte }} DH</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Restant</h5>
+                                    <p class="card-text h4">{{ project.montant_restant }} DH</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3>Description</h3>
+                        <p class="card-text">{{ project.description|linebreaks }}</p>
+                    </div>
+
+                    {% if project.date_fin %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-clock"></i> Date de fin: {{ project.date_fin|date:"d/m/Y" }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Paliers Section -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Paliers de financement</h3>
+                </div>
+                <div class="card-body">
+                    {% if project.paliers.all %}
+                    <div class="row">
+                        {% for palier in project.paliers.all %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 {% if palier == project.current_palier %}border-primary{% endif %}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ palier.titre }}</h5>
+                                    <p class="card-text">{{ palier.description }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-primary">{{ palier.montant }} DH</span>
+                                        {% if palier == project.current_palier %}
+                                        <span class="badge bg-success">Palier actuel</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Aucun palier de financement n'a été défini pour ce projet.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Creator Info -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Créateur</h4>
+                </div>
+                <div class="card-body">
+                    <h5>{{ project.createur.nom }}</h5>
+                    <p class="text-muted">{{ project.createur.email }}</p>
+                    {% if project.createur.bio %}
+                    <p>{{ project.createur.bio }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Donation Form -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Faire un don</h4>
+                </div>
+                <div class="card-body">
+                    {% if user.is_authenticated %}
+                        <div class="text-center">
+                            <p>Cliquez sur le bouton ci-dessous pour faire un don</p>
+                            <a href="{% url 'projets:donate' project.pk %}" class="btn btn-success btn-lg">
+                                <i class="fas fa-heart me-2"></i>Faire un don
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center">
+                            <p>Connectez-vous pour soutenir ce projet</p>
+                            <a href="{% url 'login' %}" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Project Actions -->
+            {% if user == project.createur.user %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Actions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'projets:project_update' project.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit"></i> Modifier le projet
+                        </a>
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fas fa-trash"></i> Supprimer le projet
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+{% if user == project.createur.user %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{% url 'projets:project_delete' project.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to set donation amount
+    window.setAmount = function(amount) {
+        document.getElementById('donationAmount').value = amount;
+    };
+
+    // Format card number
+    const cardNumber = document.getElementById('cardNumber');
+    cardNumber.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        let formattedValue = '';
+        for(let i = 0; i < value.length; i++) {
+            if(i > 0 && i % 4 === 0) {
+                formattedValue += ' ';
+            }
+            formattedValue += value[i];
+        }
+        e.target.value = formattedValue;
+    });
+
+    // Format expiry date
+    const expiryDate = document.getElementById('expiryDate');
+    expiryDate.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 2) {
+            value = value.substring(0,2) + '/' + value.substring(2,4);
+        }
+        e.target.value = value;
+    });
+
+    // Format CVV
+    const cvv = document.getElementById('cvv');
+    cvv.addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '').substring(0,3);
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

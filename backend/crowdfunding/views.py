@@ -21,11 +21,18 @@ from config.serializers import (
 )
 from config.forms import DonationForm, SignUpForm
 from config.decorators import role_required
+from rest_framework.permissions import AllowAny
 
 class Home(View):
     def get(self, request):
         projects = Projet.objects.all()
-        return render(request, 'home.html', {'projects': projects})
+        total_raised = Donation.objects.aggregate(Sum('montant'))['montant__sum'] or 0
+        total_donors = Donation.objects.count()
+        return render(request, 'home.html', {
+            'projects': projects,
+            'total_raised': total_raised,
+            'total_donors': total_donors
+        })
 
 class ProjectDetail(View):
     def get(self, request, project_id):
@@ -160,14 +167,14 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 class AdminDashboardAPI(viewsets.ViewSet):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [AllowAny]
     
     def list(self, request):
         stats = {
             'total_projects': Projet.objects.count(),
             'total_raised': Donation.objects.aggregate(Sum('montant'))['montant__sum'] or 0,
             'total_creators': Createur.objects.count(),
-            'total_donors': Donneur.objects.count()
+            'total_donors': Donneur.objects.count()  # Use actual count, not hardcoded
         }
         serializer = AdminDashboardSerializer(stats)
         return Response(serializer.data)
